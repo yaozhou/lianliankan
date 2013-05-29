@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="800" height="600">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.btn_style_sure
+		{
+			up-skin: Embed(source="Image/Embed/btn_next_level_up.png");
+			down-skin: Embed(source="Image/Embed/btn_next_level_over.png");
+			over-skin: Embed(source="Image/Embed/btn_next_level_over.png");
+		}
+	</fx:Style>
+
+	<fx:Script>
+		<![CDATA[
+			public function SureButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.EnterNextLevel() ;
+			}
+			
+			public function ShowAsNextLevelIs(nextLevel:int):void
+			{
+				//lbl_next_level.text = "" + nextLevel ;
+				img_boy.visible = (nextLevel == 2) ;
+				img_girl.visible = (nextLevel != 2) ;				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Image id="img_boy" x="0" y="0" width="800" height="600" source="@Embed('Image/Embed/next_level_1.png')"/>
+	<s:Image id="img_girl" x="0" y="0" width="800" height="600" source="@Embed('Image/Embed/next_level_2.png')"/>
+	<mx:Button x="55" y="222" width="184" height="142" click="SureButtonClicked(event)"
+			   styleName="btn_style_sure"/>	
+	
+</s:Group>

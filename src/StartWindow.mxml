@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.btn_start
+		{
+			up-skin: Embed(source="Image/Embed/btn_start_up.png"); 
+			down-skin: Embed(source="Image/Embed/btn_start_over.png");
+			over-skin: Embed(source="Image/Embed/btn_start_over.png");
+		}
+		.btn_intro
+		{
+			up-skin: Embed(source="Image/Embed/btn_intro_up.png");
+			down-skin: Embed(source="Image/Embed/btn_intro_over.png");
+			over-skin: Embed(source="Image/Embed/btn_intro_over.png");
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;	
+			import Ayao.Node ;
+			
+			public var m_UC:UIComponent = new UIComponent() ;
+			
+			public function StartGameButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.StartLevel(1) ;
+			}
+			
+			public function IntroButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.SetGameIntroWindowVisible(true) ;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Image x="0" y="0" width="800" height="600" scaleMode="stretch" source="@Embed('Image/Embed/start.png')"/>
+	<!-- 开始游戏 -->
+	<mx:Button id="btn_start" x="273" y="475" width="113" height="43"
+			   click="StartGameButtonClicked(event)" styleName="btn_start"/>
+	
+	<!-- 游戏介绍 -->
+	<mx:Button id="btn_intro" x="413" y="475" width="113" height="43" styleName="btn_intro" click="IntroButtonClicked(event)" />
+	
+	
+</s:Group>

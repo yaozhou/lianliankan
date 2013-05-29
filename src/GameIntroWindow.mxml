@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="800" height="600">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.btn_close
+		{
+			up-skin: Embed(source="Image/Embed/btn_close_up.png");
+			down-skin: Embed(source="Image/Embed/btn_close_over.png");
+			over-skin: Embed(source="Image/Embed/btn_close_over.png");
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			public function CloseButtonClicked(event:MouseEvent):void
+			{
+				 LianLianKan2.m_App.SetGameIntroWindowVisible(false) ;
+			}
+			
+		]]>
+	</fx:Script>
+	<!-- 开始游戏 -->
+	<s:Image x="0" y="0" width="800" height="600" source="@Embed('Image/Embed/game_intro.png')"/>
+	<mx:Button id="btn_start" x="606" y="89" width="35" height="35" styleName="btn_close" click="CloseButtonClicked(event)" />
+
+	
+</s:Group>

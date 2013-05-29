@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="800" height="600" initialize="Init();">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";  
+		
+		.btn_style_hint
+		{
+			up-skin: Embed(source="Image/Embed/btn_hint_up.png");
+			down-skin: Embed(source="Image/Embed/btn_hint_over.png");
+			over-skin: Embed(source="Image/Embed/btn_hint_over.png");
+		}
+		.btn_style_shuffle
+		{
+			up-skin: Embed(source="Image/Embed/btn_shuffle_up.png");
+			down-skin: Embed(source="Image/Embed/btn_shuffle_over.png");
+			over-skin: Embed(source="Image/Embed/btn_shuffle_over.png");
+		}		
+		.btn_style_sound_off
+		{
+			up-skin: Embed(source="Image/Embed/btn_sound_on_up.png");
+			down-skin: Embed(source="Image/Embed/btn_sound_on_up.png");
+			over-skin: Embed(source="Image/Embed/btn_sound_on_up.png");
+		}
+		.btn_style_sound_on
+		{
+			up-skin: Embed(source="Image/Embed/btn_sound_off_up.png");
+			down-skin: Embed(source="Image/Embed/btn_sound_off_up.png");
+			over-skin: Embed(source="Image/Embed/btn_sound_off_up.png");
+		}
+		.btn_style_music_off
+		{
+			up-skin: Embed(source="Image/Embed/btn_music_on_up.png");
+			down-skin: Embed(source="Image/Embed/btn_music_on_up.png");
+			over-skin: Embed(source="Image/Embed/btn_music_on_up.png");
+		}
+		.btn_style_music_on
+		{
+			up-skin: Embed(source="Image/Embed/btn_music_off_up.png");
+			down-skin: Embed(source="Image/Embed/btn_music_off_up.png");
+			over-skin: Embed(source="Image/Embed/btn_music_off_up.png");
+		}
+	</fx:Style>
+
+	<fx:Script>
+		<![CDATA[
+			import flash.events.MouseEvent;
+			
+			import mx.core.UIComponent;	
+			
+			
+			public var m_UC:UIComponent = new UIComponent() ;
+			
+			
+			
+			
+			/*private function  onMouseOut(event:MouseEvent):void
+			{
+				
+				CursorManager.removeCursor(0);
+				//CursorManager.setCursor(A_Cursor);
+			}
+			
+			private function  onMouseOver(event:MouseEvent):void
+			{   
+				//CursorManager.removeCursor(0);
+				CursorManager.setCursor(A_Cursor);
+			}*/
+			
+			public function Init():void
+			{
+				SceneContainer.addElement(m_UC) ;
+			}
+
+			
+			public function BackButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.ShowGameMenu() ;
+			}
+			
+			public function MusicOnButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.MusicEnable(true) ;
+			}
+			
+			public function MusicOffButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.MusicEnable(false) ;
+				
+			}
+			
+			public function SoundOnButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.SoundEnable(true) ;
+			}
+			
+			public function SoundOffButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_App.SoundEnable(false) ;
+								
+			}
+			
+			public function FlushLeftTime(leftTime:Number, totalTime:Number):void
+			{
+				//TimeBar.setProgress(leftTime, totalTime) ;
+				img_progress.scaleX = leftTime / totalTime ; 
+			}
+			
+			public function FlushLevelInfo2UI(hintNum:int, shuffleNum:int, curLvl:int, leftTime:Number, 
+											  totalTime:Number, soundVol:Number, musicVol:Number):void
+			{
+				lbl_hint_num.text = "" + hintNum ;
+				lbl_shuffle_num.text = "" + shuffleNum ;
+				lbl_cur_level.text = "" + curLvl ; 
+				FlushLeftTime(leftTime, totalTime) ;				
+
+				btn_sound_off.visible = (LianLianKan2.m_App.m_SoundVol > 0) ;
+				btn_sound_on.visible = (LianLianKan2.m_App.m_SoundVol <= 0) ;
+				btn_music_off.visible = (LianLianKan2.m_App.m_MusicVol > 0) ;
+				btn_music_on.visible = (LianLianKan2.m_App.m_MusicVol <= 0) ;
+			}
+			
+			public function HintButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_CurScene.Hint() ;
+			}
+			
+			public function ReshuffleButtonClicked(event:MouseEvent):void
+			{
+				LianLianKan2.m_CurScene.ReShuffle(false) ;
+			} 
+			 
+		]]> 
+	</fx:Script> 
+	<s:Image x="-3" y="0" width="800" height="600" scaleMode="stretch" source="@Embed('Image/Embed/main.png')"/>
+	<mx:Button id="btn_shuffle" x="717" y="89" click="ReshuffleButtonClicked(event)"
+			   styleName="btn_style_shuffle"/>	
+	<mx:Button id="btn_hint" x="634" y="89" click="HintButtonClicked(event)" styleName="btn_style_hint"/>
+	<s:Label id="lbl_shuffle_num" x="742" y="103" width="26" height="30" color="#000000" mouseEnabled = "false"
+			 fontFamily="Arial" fontSize="35" text="3"/>
+	<s:Label id="lbl_hint_num" x="659" y="103" width="21" height="39" color="#FCFAFA" mouseEnabled = "false"
+			 fontFamily="Arial" fontSize="35" text="3"/>
+	<mx:Button id="btn_sound_on" x="697" y="445" width="62" height="62"
+			   click="SoundOnButtonClicked(event)" styleName="btn_style_sound_on" />
+	<mx:Button id="btn_sound_off" x="695" y="444" width="62" height="62"
+			   click="SoundOffButtonClicked(event)" styleName="btn_style_sound_off"/>
+	<mx:Button id="btn_music_on" x="618" y="444" width="62" height="62"
+			   click="MusicOnButtonClicked(event)" styleName="btn_style_music_on"/>
+	<mx:Button id="btn_music_off" x="616" y="444" width="62" height="62"
+			   click="MusicOffButtonClicked(event)" styleName="btn_style_music_off"/>
+	<s:Label id="lbl_cur_level" x="625" y="-32" width="21" height="28" color="#2D804C"
+			 fontFamily="Arial" fontSize="35" text="1"/> 
+	<s:Group id="SceneContainer" x="58" y="67" width="468" height="370">
+	</s:Group>	
+	<s:Image x="250" y="485" width="273" height="22" source="@Embed('Image/Embed/progress_track.png')"/>
+	<s:Image id="img_progress" x="250" y="486" width="274" height="22"
+			 source="@Embed('Image/Embed/progress_bar.png')"/>
+	
+	
+	
+	
+</s:Group>

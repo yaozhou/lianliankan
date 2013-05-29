@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   width="800" height="600"
+					   applicationComplete="GameInit();">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import Ayao.Node;
+			import Ayao.Scene;
+			
+			import flash.display.MovieClip;
+			
+			import mx.controls.Alert;
+			import mx.controls.Button;
+			import mx.controls.SWFLoader;
+			import mx.core.UIComponent;
+			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
+			
+			public static var m_App:LianLianKan2 ;
+			
+			// 选择界面
+			private var m_StartWindow:StartWindow = new StartWindow() ;
+			private var m_GameIntroWindow:GameIntroWindow = new GameIntroWindow() ;
+			public var m_GameMainWindow:GameMainWindow = new GameMainWindow() ;
+			public var m_NextLevelWindow:NextLevelWindow = new NextLevelWindow() ;
+			public var m_LevelFailedWindow:LevelFailedWindow = new LevelFailedWindow() ;
+			public var m_SuccessWindow:SuccessWindow = new SuccessWindow() ;
+			
+			// NODE图片资源
+			public static var m_BitmapAry:Array = new Array() ;	
+			public static const PIC_NUM:int = 29 ;
+			
+			// 通过图片路径获得此图片的索引
+			//private static var m_PicPath2IdxMap:Object = new Object() ;
+			//private static var m_ImageIdxInLoading:int = 0 ;
+			
+			// 游戏配置
+			public static const LEVEL_NUM:int = 3 ;
+			public static var m_LevelConfig:Object = new Array() ;
+			public static var m_CurScene:Ayao.Scene ;
+			
+			private static const DEFAULT_SOUND_VOL:Number = 0.3 ;
+			private static const DEFAULT_MUSIC_VOL:Number = 0.7 ;
+			 
+			private var m_MusicChannel:SoundChannel ;
+			public var m_SoundVol:Number = DEFAULT_SOUND_VOL ;
+			public var m_MusicVol:Number = DEFAULT_MUSIC_VOL ;
+			
+			// 连击时间间隔
+			public static const CONTINUE_HIT_INTERVAL:int = 2500 ;
+			// 连击次数上限
+			public static const MAX_CONTINUE_HIT:int = 10 ;
+			// 连击时间奖励
+			public static var m_ContinueHitBonus:Array = new Array() ;
+			// 报警时间
+			public static const ALARM_TIME:Number = 4 ;
+			
+			[Embed(source="Image/embed/cursor.png")]
+			private var m_Cursor:Class;
+			
+			[Embed(source="Image/embed/0.png")]
+			public var m_Pic0:Class ;			
+			[Embed(source="Image/embed/1.png")]
+			public var m_Pic1:Class ;
+			[Embed(source="Image/embed/2.png")]
+			public var m_Pic2:Class ;
+			[Embed(source="Image/embed/3.png")]
+			public var m_Pic3:Class ;
+			[Embed(source="Image/embed/4.png")]
+			public var m_Pic4:Class ;
+			[Embed(source="Image/embed/5.png")]
+			public var m_Pic5:Class ;
+			[Embed(source="Image/embed/6.png")]
+			public var m_Pic6:Class ;
+			[Embed(source="Image/embed/7.png")]
+			public var m_Pic7:Class ;
+			[Embed(source="Image/embed/8.png")]
+			public var m_Pic8:Class ;
+			[Embed(source="Image/embed/9.png")]
+			public var m_Pic9:Class ;
+			[Embed(source="Image/embed/10.png")]
+			public var m_Pic10:Class ;
+			[Embed(source="Image/embed/11.png")]
+			public var m_Pic11:Class ;
+			[Embed(source="Image/embed/12.png")]
+			public var m_Pic12:Class ;
+			[Embed(source="Image/embed/13.png")]
+			public var m_Pic13:Class ;
+			[Embed(source="Image/embed/14.png")]
+			public var m_Pic14:Class ;
+			[Embed(source="Image/embed/15.png")]
+			public var m_Pic15:Class ;
+			[Embed(source="Image/embed/16.png")]
+			public var m_Pic16:Class ;
+			[Embed(source="Image/embed/17.png")]
+			public var m_Pic17:Class ;
+			[Embed(source="Image/embed/18.png")]
+			public var m_Pic18:Class ;
+			[Embed(source="Image/embed/19.png")]
+			public var m_Pic19:Class ;
+			[Embed(source="Image/embed/20.png")]
+			public var m_Pic20:Class ;
+			[Embed(source="Image/embed/21.png")]
+			public var m_Pic21:Class ;
+			[Embed(source="Image/embed/22.png")]
+			public var m_Pic22:Class ;
+			[Embed(source="Image/embed/23.png")]
+			public var m_Pic23:Class ;
+			[Embed(source="Image/embed/24.png")]
+			public var m_Pic24:Class ;
+			[Embed(source="Image/embed/25.png")]
+			public var m_Pic25:Class ;
+			[Embed(source="Image/embed/26.png")]
+			public var m_Pic26:Class ;
+			[Embed(source="Image/embed/27.png")]
+			public var m_Pic27:Class ;
+			[Embed(source="Image/embed/28.png")]
+			public var m_Pic28:Class ;
+			
+			[Embed(source="Sound/baojing.mp3")] 
+			public var m_SoundBaoJingClass:Class ;
+			[Embed(source="Sound/dianji.mp3")] 
+			public var m_SoundDianJiClass:Class ;
+			[Embed(source="Sound/guoguan.mp3")] 
+			public var m_SoundGuoGuanClass:Class ;
+			[Embed(source="Sound/shibai.mp3")] 
+			public var m_SoundShiBaiClass:Class ;
+			[Embed(source="Sound/xiaoshi.mp3")] 
+			public var m_SoundXiaoShiClass:Class ;
+			[Embed(source="Sound/bk.mp3")] 
+			public var m_SoundBkClass:Class ;
+			
+			public var m_SoundBaoJing:Sound = new m_SoundBaoJingClass ;
+			public var m_SoundDianJi:Sound = new m_SoundDianJiClass ;
+			public var m_SoundGuoGuan:Sound = new m_SoundGuoGuanClass ;
+			public var m_SoundShiBai:Sound = new m_SoundShiBaiClass ;
+			public var m_SoundXiaoShi:Sound = new m_SoundXiaoShiClass ;
+			public var m_SoundBk:Sound = new m_SoundBkClass ;			
+			
+			public function GetBitmapClass(i:int):Class
+			{
+				switch (i)
+				{
+					case 0: return m_Pic0 ; break ;
+					case 1: return m_Pic1 ; break ;
+					case 2: return m_Pic2 ; break ;
+					case 3: return m_Pic3 ; break ;
+					case 4: return m_Pic4 ; break ;
+					case 5: return m_Pic5 ; break ;
+					case 6: return m_Pic6 ; break ;
+					case 7: return m_Pic7 ; break ;
+					case 8: return m_Pic8 ; break ;
+					case 9: return m_Pic9 ; break ;
+					case 10: return m_Pic10 ; break ;
+					case 11: return m_Pic11 ; break ;
+					case 12: return m_Pic12 ; break ;
+					case 13: return m_Pic13 ; break ;
+					case 14: return m_Pic14 ; break ;
+					case 15: return m_Pic15 ; break ;
+					case 16: return m_Pic16 ; break ;
+					case 17: return m_Pic17 ; break ;
+					case 18: return m_Pic18 ; break ;
+					case 19: return m_Pic19 ; break ;
+					case 20: return m_Pic20 ; break ;
+					case 21: return m_Pic21 ; break ;
+					case 22: return m_Pic22 ; break ;
+					case 23: return m_Pic23 ; break ;
+					case 24: return m_Pic24 ; break ;
+					case 25: return m_Pic25 ; break ;
+					case 26: return m_Pic26 ; break ;
+					case 27: return m_Pic27 ; break ;
+					case 28: return m_Pic28 ; break ;
+					default: return null ;						
+				}
+			}
+			
+			// 载入关卡配置
+			public function LoadLevelConfig():void
+			{
+				m_ContinueHitBonus = [0,0,1,1,1,1,1,1,1,1,1] ;				
+				
+				// 第一关配置
+				// 4,5,6,11,16,18,23,24,25,26     25,23,24,26, | 21,22
+				var config1:Object = new Object() ;
+				//config1.nodeNumConfig = [0,8,8,8,0,8,8,8,8] ;	
+				config1.nodeNumConfig = [0,0,0,6,6,6,0,0,0,0,6,0,0,0,0,6,0,0,0,0,0,0,6,6,8,6] ;
+				config1.xWidth = 8 ;
+				config1.yWidth = 8 ;
+				config1.posConfig = [0,1,2,3,4,5,6,7,
+									100,101,102,103,104,105,106,107,
+									200,201,/*202,203,204,205,*/206,207,
+									300,301,302,303,304,305,306,307, 
+									400,401,402,403,404,405,406,407,
+									500,501,/*502,503,504,505,*/506,507,
+									600,601,602,603,604,605,606,607,
+									700,701,702,703,704,705,706,707] ;
+				config1.timeLimit = 60 ;
+				m_LevelConfig[0] = config1 ; 
+				
+				// 第二关配置
+				var config2:Object = new Object() ;
+				//config2.nodeNumConfig = [0,6,6,6,6,0,6,6,6,6,8] ;		
+				config2.nodeNumConfig = [0,0,0,4,4,4,0,0,0,0,4,0,0,0,0,6,0,0,0,0,4,6,6,6,6,6] ;
+				config2.xWidth = 8 ;
+				config2.yWidth = 8 ; 
+				config2.posConfig = [0,1,2,3,4,5,6,7,
+					100,101,102,103,104,105,106,107,
+					200,201,/*202,*/203,204,205,206,207,
+					300,301,/*302,*/303,304,305,306,307,
+					400,401,/*402,*/403,404,/*405,*/406,407,
+					500,501,/*502,*/503,504,/*505,*/506,507,
+					600,601,602,603,604,/*605,*/606,607,
+					700,701,702,703,704,/*705,*/706,707] ;
+				config2.timeLimit = 45 ;
+				m_LevelConfig[1] = config2 ;
+				 
+				// 第三关配置
+				var config3:Object = new Object() ;
+				//config3.nodeNumConfig = [0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,6,6,6,6,0,6,10] ;	
+				config3.nodeNumConfig = [4,4,4,0,4,4,4,6,6,4,0,4,4,4,0,4,0,0,0,0,4,4,4,4,4,4,0,0] ;
+				config3.xWidth = 10 ;
+				config3.yWidth = 8 ;
+				config3.posConfig = [0,1,2,3,4,5,6,7,8,9,
+					100,101,102,103,104,105,106,107,108,109,
+					200,201,202,203,204,205,206,207,208,209,
+					300,301,302,303,304,305,306,307,308,309,
+					400,401,402,403,404,405,406,407,408,409,
+					500,501,502,503,504,505,506,507,508,509, 
+					600,601,602,603,604,605,606,607,608,609,
+					700,701,702,703,704,705,706,707,708,709
+					//800,801,802,803,804,805,806,807,808,809,
+					//900,901,902,903,904,905,906,907,908,909
+				] ; 
+				config3.timeLimit = 110 ; 			
+				m_LevelConfig[2] = config3 ;
+				
+				//m_LevelConfig[0] = config3 ;
+			}			 
+			
+			private function GetPicPathFromUrlStr(urlStr:String):String
+			{
+				for(var i:int=0; i<PIC_NUM; ++i)
+				{
+					if (urlStr.indexOf("Image\\Node\\" + i + ".png") != -1 ||
+						urlStr.indexOf("Image/Node/" + i + ".png") != -1)
+						return "Image/Node/" + i + ".png" ;
+				}
+				return "" ;
+			}
+			
+			public function GameInit():void
+			{
+				m_App = this ;
+				
+				m_BitmapAry[0] = new m_Pic0 ;
+				m_BitmapAry[1] = new m_Pic1 ;
+				m_BitmapAry[2] = new m_Pic2 ;
+				m_BitmapAry[3] = new m_Pic3 ;
+				m_BitmapAry[4] = new m_Pic4 ;
+				m_BitmapAry[5] = new m_Pic5 ;
+				m_BitmapAry[6] = new m_Pic6 ;
+				m_BitmapAry[7] = new m_Pic7 ;
+				m_BitmapAry[8] = new m_Pic8 ;
+				m_BitmapAry[9] = new m_Pic9 ;
+				m_BitmapAry[10] = new m_Pic10 ;
+				m_BitmapAry[11] = new m_Pic11 ;
+				m_BitmapAry[12] = new m_Pic12 ;
+				m_BitmapAry[13] = new m_Pic13 ;
+				m_BitmapAry[14] = new m_Pic14 ;
+				m_BitmapAry[15] = new m_Pic15 ;
+				m_BitmapAry[16] = new m_Pic16 ;
+				m_BitmapAry[17] = new m_Pic17 ;
+				m_BitmapAry[18] = new m_Pic18 ;
+				m_BitmapAry[19] = new m_Pic19 ;
+				m_BitmapAry[20] = new m_Pic20 ;
+				m_BitmapAry[21] = new m_Pic21 ;
+				m_BitmapAry[22] = new m_Pic22 ;
+				m_BitmapAry[23] = new m_Pic23 ;
+				m_BitmapAry[24] = new m_Pic24 ;
+				m_BitmapAry[25] = new m_Pic25 ;
+				m_BitmapAry[26] = new m_Pic26 ;
+				m_BitmapAry[27] = new m_Pic27 ;
+				m_BitmapAry[28] = new m_Pic28 ;
+	
+				
+				LoadLevelConfig() ;
+ 
+				this.addElement(m_StartWindow) ; 
+				this.addElement(m_GameIntroWindow) ;
+				this.addElement(m_GameMainWindow) ;
+				this.addElement(m_LevelFailedWindow) ;
+				this.addElement(m_NextLevelWindow) ;
+				this.addElement(m_SuccessWindow) ;
+				  
+				ShowGameMenu() ;
+			}
+			
+			public function EnterNextLevel():void
+			{
+				StartLevel(m_CurScene.m_CurLevel+1) ;
+			}
+			
+			public function StartLevel(lvl:int):void
+			{
+				m_StartWindow.visible = false ;
+				m_GameIntroWindow.visible = false ;
+				m_GameMainWindow.visible = true ;
+				m_LevelFailedWindow.visible = false ;
+				m_SuccessWindow.visible = false ;
+				m_NextLevelWindow.visible = false ;
+				
+				
+				
+				// 卸载老游戏
+				if (m_CurScene != null)
+				{
+					m_CurScene.Close() ;
+					m_GameMainWindow.m_UC.removeChild(m_CurScene) ;						
+				}
+				
+				var config:Object = m_LevelConfig[lvl-1] ;
+				m_CurScene = new Ayao.Scene(config.posConfig, config.nodeNumConfig, config.xWidth, config.yWidth, config.timeLimit, lvl) ;
+				
+				trace("time = " + config.timeLimit) ;
+				m_CurScene.FlushLevelInfo2UI() ;
+				m_GameMainWindow.m_UC.addChild(m_CurScene) ;
+				m_GameMainWindow.m_UC.visible = true ;
+				
+				PlayBkMusic() ;
+			}			
+			
+			public function ShowGameMenu():void
+			{
+				m_StartWindow.visible = true ;
+				m_GameIntroWindow.visible = false ;
+				m_GameMainWindow.visible = false ;
+				m_LevelFailedWindow.visible = false ;
+				m_SuccessWindow.visible = false ;
+				m_NextLevelWindow.visible = false ;
+			}
+			
+			public function ShowFailedWindow():void
+			{
+				m_LevelFailedWindow.visible = true ;
+			}
+			
+			public function ShowSuccessWindow():void
+			{
+				m_SuccessWindow.visible = true ;
+			}
+			
+			public function ShowNextLevelWindow(nextLevel:int):void
+			{
+				m_NextLevelWindow.ShowAsNextLevelIs(nextLevel) ;
+				m_NextLevelWindow.visible = true ;
+			}
+			
+			public function SetGameIntroWindowVisible(b:Boolean):void
+			{
+				m_GameIntroWindow.visible = b ;
+			}
+			
+			public function PlaySound(sound:Sound):void
+			{
+				if (m_SoundVol > 0)
+					sound.play(0, 1, new SoundTransform(m_SoundVol)) ;
+			}
+			
+			public function PlayBkMusic():void
+			{
+				if (m_MusicChannel != null)
+					m_MusicChannel.stop() ; 
+				
+				m_MusicChannel = m_SoundBk.play(0, int.MAX_VALUE, new SoundTransform(m_MusicVol)) ;
+			}
+			
+			public function StopBkMusic():void
+			{
+				if (m_MusicChannel != null)
+					m_MusicChannel.stop() ;
+			}
+			
+			public function MusicEnable(b:Boolean):void
+			{
+				if (b)  
+				{
+					m_MusicVol = DEFAULT_MUSIC_VOL ;
+					if (m_MusicChannel != null)
+					{
+						var transfrom1:SoundTransform = new SoundTransform(DEFAULT_MUSIC_VOL) ;
+						m_MusicChannel.soundTransform = transfrom1 ;
+					}
+				}else
+				{
+					m_MusicVol = 0 ;
+					if (m_MusicChannel != null)
+					{
+						var transfrom2:SoundTransform = new SoundTransform(0) ;
+						m_MusicChannel.soundTransform = transfrom2 ;
+					}
+				}				
+				
+				m_CurScene.FlushLevelInfo2UI() ;
+			}
+			
+			public function SoundEnable(b:Boolean):void
+			{
+				if (b)
+					m_SoundVol = DEFAULT_SOUND_VOL ;
+				else
+					m_SoundVol = 0 ;
+				
+				m_CurScene.FlushLevelInfo2UI() ;
+			} 
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</s:WindowedApplication>
